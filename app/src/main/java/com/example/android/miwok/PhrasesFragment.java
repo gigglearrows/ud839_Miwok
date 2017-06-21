@@ -1,33 +1,24 @@
-/*
- * Copyright (C) 2016 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.android.miwok;
+
 
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ColorsActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class PhrasesFragment extends Fragment {
 
     private AudioManager audioManager;
     private MediaPlayer mediaPlayer;
@@ -54,29 +45,34 @@ public class ColorsActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.word_list);
+    public PhrasesFragment() {
+        // Required empty public constructor
+    }
 
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.word_list, container, false);
+
+        audioManager = (AudioManager) getActivity().getSystemService(Context.AUDIO_SERVICE);
 
         final ArrayList<Word> words = new ArrayList<>();
         words.addAll(Arrays.asList(
-                new Word("red", "weṭeṭṭi", R.raw.color_red, R.drawable.color_red),
-                new Word("green", "chokokki", R.raw.color_green, R.drawable.color_green),
-                new Word("brown", "ṭakaakki", R.raw.color_brown, R.drawable.color_brown),
-                new Word("gray", "ṭopoppi", R.raw.color_gray, R.drawable.color_gray),
-                new Word("black", "kululli", R.raw.color_black, R.drawable.color_black),
-                new Word("white", "kelelli", R.raw.color_white, R.drawable.color_white),
-                new Word("dusty yellow", "ṭopiisә", R.raw.color_dusty_yellow,
-                        R.drawable.color_dusty_yellow),
-                new Word("mustard yellow", "chiwiiṭә", R.raw.color_mustard_yellow,
-                        R.drawable.color_mustard_yellow)
+                new Word("Where are you going?", "minto wuksus", R.raw.phrase_where_are_you_going),
+                new Word("What is your name?", "tinnә oyaase'nә", R.raw.phrase_what_is_your_name),
+                new Word("My name is...", "oyaaset...", R.raw.phrase_my_name_is),
+                new Word("How are you feeling?", "michәksәs?", R.raw.phrase_how_are_you_feeling),
+                new Word("I’m feeling good.", "kuchi achit", R.raw.phrase_im_feeling_good),
+                new Word("Are you coming?", "әәnәs'aa?", R.raw.phrase_are_you_coming),
+                new Word("Yes, I’m coming.", "hәә’ әәnәm", R.raw.phrase_yes_im_coming),
+                new Word("I’m coming.", "әәnәm", R.raw.phrase_im_coming),
+                new Word("Let’s go.", "yoowutis", R.raw.phrase_lets_go),
+                new Word("Come here.", "әnni'nem", R.raw.phrase_come_here)
         ));
 
-        WordAdapter itemsAdapter = new WordAdapter(this, words, R.color.category_colors);
-        ListView listView = (ListView) findViewById(R.id.list);
+        WordAdapter itemsAdapter = new WordAdapter(getActivity(), words, R.color.category_phrases);
+        ListView listView = rootView.findViewById(R.id.list);
         listView.setAdapter(itemsAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -89,16 +85,18 @@ public class ColorsActivity extends AppCompatActivity {
                 int result = audioManager.requestAudioFocus(audioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
                 if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                     //We have audiofocus. start playback
-                    mediaPlayer = MediaPlayer.create(ColorsActivity.this, word.getAudioResourceId());
+                    mediaPlayer = MediaPlayer.create(getActivity(), word.getAudioResourceId());
                     mediaPlayer.start();
                     mediaPlayer.setOnCompletionListener(completionListener);
                 }
             }
         });
+
+        return rootView;
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         releaseMediaPlayer();
     }
@@ -121,4 +119,5 @@ public class ColorsActivity extends AppCompatActivity {
             audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
     }
+
 }
